@@ -1,268 +1,255 @@
-// Cek autentikasi Login Admin
-if (localStorage.getItem("isAdminLoggedIn") !== "true") {
-  alert("Anda harus login terlebih dahulu!");
-  window.location.href = "admin-login.html";
-}
+const BACKEND_URL = "https://kopikenangan-production.up.railway.app";
 
-function logoutAdmin() {
-  localStorage.removeItem("isAdminLoggedIn");
-  window.location.href = "admin-login.html";
-}
+// Cek apakah admin sudah login saat halaman dibuka
+document.addEventListener("DOMContentLoaded", () => {
+  const isLoggedIn = localStorage.getItem("isAdminLoggedIn");
+  if (!isLoggedIn) {
+    window.location.href = "admin-login.html";
+    return;
+  }
 
-// Fungsi Utama Memuat Semua Data
-async function loadAllData() {
-  await Promise.all([loadProducts(), loadOrders(), loadContacts()]);
-}
+  loadProducts();
+  loadOrders();
+  loadContacts();
 
-// 1. Ambil & Tampilkan Daftar Produk
+  // Tombol Refresh
+  const btnRefresh = document.getElementById("btn-refresh-data");
+  if (btnRefresh) {
+    btnRefresh.addEventListener("click", () => {
+      loadProducts();
+      loadOrders();
+      loadContacts();
+      alert("Data berhasil dimuat ulang!");
+    });
+  }
+
+  // Tombol Logout
+  const btnLogout = document.getElementById("btn-logout");
+  if (btnLogout) {
+    btnLogout.addEventListener("click", () => {
+      localStorage.removeItem("isAdminLoggedIn");
+      window.location.href = "admin-login.html";
+    });
+  }
+
+  // Form Tambah Produk
+  const addProductForm = document.getElementById("addProductForm");
+  if (addProductForm) {
+    addProductForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("productName").value;
+      const price = document.getElementById("productPrice").value;
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/products`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, price })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          alert("Produk berhasil ditambahkan!");
+          addProductForm.reset();
+          loadProducts();
+        } else {
+          alert(data.error || "Gagal menambahkan produk.");
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        alert("Gagal terhubung ke server.");
+      }
+    });
+  }
+
+  // Form Edit Produk
+  const editProductForm = document.getElementById("editProductForm");
+  if (editProductForm) {
+    editProductForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("editProductId").value;
+      const name = document.getElementById("editProductName").value;
+      const price = document.getElementById("editProductPrice").value;
+
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/admin/products/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, price })
+        });
+        if (res.ok) {
+          alert("Produk berhasil diperbarui!");
+          closeEditModal();
+          loadProducts();
+        } else {
+          alert("Gagal memperbarui produk.");
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        alert("Gagal terhubung ke server.");
+      }
+    });
+  }
+});
+
+// Fungsi Memuat Daftar Produk
 async function loadProducts() {
-  const tableBody = document.querySelector("#products-table-body");
-  if (!tableBody) return;
+  const tbody = document.getElementById("products-table-body");
+  if (!tbody) return;
 
   try {
-    const response = await fetch("http://localhost:3000/api/admin/products");
-    const products = await response.json();
+    const res = await fetch(`${BACKEND_URL}/api/admin/products`);
+    const products = await res.json();
 
     if (products.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Belum ada menu produk.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Belum ada menu produk.</td></tr>`;
       return;
     }
 
-    tableBody.innerHTML = "";
-    products.forEach((prod) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>#${prod.id}</td>
-        <td>${prod.name}</td>
-        <td>IDR ${prod.price.toLocaleString("id-ID")}</td>
-        <td style="display: flex; gap: 0.5rem;">
-          <button style="background-color: #ff9800; color: #000; border: none; padding: 0.4rem 0.8rem; border-radius: 0.3rem; cursor: pointer; font-weight: 600;" onclick="openEditModal(${prod.id}, '${prod.name}', ${prod.price})">Edit</button>
-          <button class="btn-delete" onclick="deleteProduct(${prod.id})">Hapus</button>
+    tbody.innerHTML = products.map((p, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${p.name}</td>
+        <td>IDR ${Number(p.price).toLocaleString()}</td>
+        <td>
+          <button class="btn-refresh" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; display: inline-block; margin-right: 0.3rem;" onclick="openEditModal('${p._id || p.id}', '${p.name}', ${p.price})">Edit</button>
+          <button class="btn-delete" onclick="deleteProduct('${p._id || p.id}')">Hapus</button>
         </td>
-      `;
-      tableBody.appendChild(tr);
-    });
+      </tr>
+    `).join("");
   } catch (err) {
-    console.error("Gagal memuat produk:", err);
-    tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Gagal terhubung ke server backend.</td></tr>`;
+    console.error("Error:", err);
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Gagal memuat produk.</td></tr>`;
   }
 }
 
-// 2. Tambah Produk Baru
-const addProductForm = document.querySelector("#addProductForm");
-if (addProductForm) {
-  addProductForm.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const name = document.querySelector("#productName").value;
-    const price = parseInt(document.querySelector("#productPrice").value);
-
-    try {
-      const response = await fetch("http://localhost:3000/api/admin/products", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, price })
-      });
-
-      if (response.ok) {
-        alert("Produk baru berhasil ditambahkan!");
-        addProductForm.reset();
-        loadProducts();
-      } else {
-        alert("Gagal menambahkan produk.");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-    }
-  });
-}
-
-// 3. Hapus Produk
-async function deleteProduct(productId) {
-  if (!confirm("Apakah Anda yakin ingin menghapus menu ini?")) return;
+// Fungsi Hapus Produk
+async function deleteProduct(id) {
+  if (!confirm("Apakah Anda yakin ingin menghapus produk ini?")) return;
 
   try {
-    const response = await fetch(`http://localhost:3000/api/admin/products/${productId}`, {
+    const res = await fetch(`${BACKEND_URL}/api/admin/products/${id}`, {
       method: "DELETE"
     });
-
-    if (response.ok) {
+    if (res.ok) {
       alert("Produk berhasil dihapus!");
       loadProducts();
+    } else {
+      alert("Gagal menghapus produk.");
     }
   } catch (err) {
-    console.error("Gagal menghapus produk:", err);
+    console.error("Error:", err);
+    alert("Gagal terhubung ke server.");
   }
 }
 
-// 4. Modal Edit Produk
+// Modal Edit Handler
 function openEditModal(id, name, price) {
-  const idInput = document.querySelector("#editProductId");
-  const nameInput = document.querySelector("#editProductName");
-  const priceInput = document.querySelector("#editProductPrice");
-  
-  if (idInput) idInput.value = id;
-  if (nameInput) nameInput.value = name;
-  if (priceInput) priceInput.value = price;
-  
-  const modal = document.querySelector("#editProductModal");
-  if (modal) modal.style.display = "flex";
+  document.getElementById("editProductId").value = id;
+  document.getElementById("editProductName").value = name;
+  document.getElementById("editProductPrice").value = price;
+  document.getElementById("editProductModal").style.display = "flex";
 }
 
 function closeEditModal() {
-  const modal = document.querySelector("#editProductModal");
-  if (modal) modal.style.display = "none";
+  document.getElementById("editProductModal").style.display = "none";
 }
 
-const editProductForm = document.querySelector("#editProductForm");
-if (editProductForm) {
-  editProductForm.addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const id = document.querySelector("#editProductId").value;
-    const name = document.querySelector("#editProductName").value;
-    const price = parseInt(document.querySelector("#editProductPrice").value);
-
-    try {
-      const response = await fetch(`http://localhost:3000/api/admin/products/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, price })
-      });
-
-      if (response.ok) {
-        alert("Menu berhasil diperbarui!");
-        closeEditModal();
-        loadProducts();
-      } else {
-        alert("Gagal memperbarui menu.");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-    }
-  });
-}
-
-// 5. Ambil & Tampilkan Daftar Pesanan Masuk
+// Fungsi Memuat Daftar Transaksi/Pesanan
 async function loadOrders() {
-  const tableBody = document.querySelector("#orders-table-body");
-  if (!tableBody) return;
+  const tbody = document.getElementById("orders-table-body");
+  if (!tbody) return;
 
   try {
-    const response = await fetch("http://localhost:3000/api/admin/orders");
-    const orders = await response.json();
+    const res = await fetch(`${BACKEND_URL}/api/admin/orders`);
+    const orders = await res.json();
 
     if (orders.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Belum ada transaksi masuk.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Belum ada transaksi masuk.</td></tr>`;
       return;
     }
 
-    tableBody.innerHTML = "";
-
-    orders.forEach((order) => {
-      const orderId = order.id || order.order_id;
-      const date = new Date(order.created_at).toLocaleString("id-ID");
-      const statusClass =
-        order.status === "Selesai" ? "badge-selesai" : "badge-pending";
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>#${orderId || "N/A"}</td>
-        <td>${order.customer_name}</td>
-        <td>${order.phone}</td>
-        <td>${order.items || "-"}</td>
-        <td>IDR ${order.total_amount.toLocaleString("id-ID")}</td>
-        <td>${date}</td>
-        <td><span class="badge ${statusClass}">${order.status}</span></td>
+    tbody.innerHTML = orders.map((o, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${o.name || o.customerName || "-"}</td>
+        <td>${o.phone || "-"}</td>
+        <td>${Array.isArray(o.items) ? o.items.map(i => `${i.name} (${i.size}) x${i.quantity}`).join(", ") : "-"}</td>
+        <td>IDR ${Number(o.total || o.totalPrice || 0).toLocaleString()}</td>
+        <td>${o.date ? new Date(o.date).toLocaleString() : "-"}</td>
+        <td><span class="badge ${o.status === 'Selesai' ? 'badge-selesai' : 'badge-pending'}">${o.status || 'Pending'}</span></td>
         <td>
-          <select onchange="updateStatus(${orderId}, this.value)">
-            <option value="Pending" ${order.status === "Pending" ? "selected" : ""}>Pending</option>
-            <option value="Selesai" ${order.status === "Selesai" ? "selected" : ""}>Selesai</option>
-          </select>
+          <button class="btn-delete" onclick="deleteOrder('${o._id || o.id}')">Hapus</button>
         </td>
-      `;
-      tableBody.appendChild(tr);
-    });
-
-    if (window.feather) feather.replace();
+      </tr>
+    `).join("");
   } catch (err) {
-    console.error("Gagal memuat pesanan:", err);
-    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: red;">Gagal terhubung ke server backend.</td></tr>`;
+    console.error("Error:", err);
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: red;">Gagal memuat pesanan.</td></tr>`;
   }
 }
 
-async function updateStatus(orderId, newStatus) {
+// Fungsi Hapus Pesanan
+async function deleteOrder(id) {
+  if (!confirm("Apakah Anda yakin ingin menghapus data pesanan ini?")) return;
+
   try {
-    const response = await fetch(
-      `http://localhost:3000/api/admin/orders/${orderId}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert(`Status pesanan #${orderId} berhasil diubah menjadi ${newStatus}`);
+    const res = await fetch(`${BACKEND_URL}/api/admin/orders/${id}`, {
+      method: "DELETE"
+    });
+    if (res.ok) {
+      alert("Pesanan berhasil dihapus!");
       loadOrders();
     } else {
-      alert("Gagal dari Server: " + (data.error || "Terjadi kesalahan"));
+      alert("Gagal menghapus pesanan.");
     }
   } catch (err) {
-    console.error("Gagal memperbarui status:", err);
-    alert("Terjadi kesalahan koneksi ke server.");
+    console.error("Error:", err);
+    alert("Gagal terhubung ke server.");
   }
 }
 
-// 6. Ambil & Tampilkan Daftar Pesan Kontak
+// Fungsi Memuat Pesan Kontak
 async function loadContacts() {
-  const tableBody = document.querySelector("#contacts-table-body");
-  if (!tableBody) return;
+  const tbody = document.getElementById("contacts-table-body");
+  if (!tbody) return;
 
   try {
-    const response = await fetch("http://localhost:3000/api/admin/contacts");
-    const contacts = await response.json();
+    const res = await fetch(`${BACKEND_URL}/api/admin/contacts`);
+    const contacts = await res.json();
 
     if (contacts.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Belum ada pesan kontak masuk.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center;">Belum ada pesan kontak.</td></tr>`;
       return;
     }
 
-    tableBody.innerHTML = "";
-    contacts.forEach((msg) => {
-      const date = new Date(msg.created_at).toLocaleString("id-ID");
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>#${msg.id}</td>
-        <td>${msg.name}</td>
-        <td>${msg.email}</td>
-        <td>${msg.phone}</td>
-        <td>${msg.message}</td>
-        <td>${date}</td>
+    tbody.innerHTML = contacts.map((c, index) => `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${c.name || "-"}</td>
+        <td>${c.email || "-"}</td>
+        <td>${c.phone || "-"}</td>
+        <td>${c.message || "-"}</td>
+        <td>${c.date ? new Date(c.date).toLocaleString() : "-"}</td>
         <td>
-          <button class="btn-delete" onclick="deleteContact(${msg.id})">Hapus</button>
+          <button class="btn-delete" onclick="deleteContact('${c._id || c.id}')">Hapus</button>
         </td>
-      `;
-      tableBody.appendChild(tr);
-    });
+      </tr>
+    `).join("");
   } catch (err) {
-    console.error("Gagal memuat pesan kontak:", err);
-    tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">Gagal terhubung ke server backend.</td></tr>`;
+    console.error("Error:", err);
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">Gagal memuat pesan kontak.</td></tr>`;
   }
 }
 
-// Hapus Pesan Kontak
+// Fungsi Hapus Pesan Kontak
 async function deleteContact(id) {
   if (!confirm("Apakah Anda yakin ingin menghapus pesan ini?")) return;
 
   try {
-    const response = await fetch(`http://localhost:3000/api/admin/contacts/${id}`, {
+    const res = await fetch(`${BACKEND_URL}/api/admin/contacts/${id}`, {
       method: "DELETE"
     });
-
-    if (response.ok) {
+    if (res.ok) {
       alert("Pesan berhasil dihapus!");
       loadContacts();
     } else {
@@ -270,26 +257,6 @@ async function deleteContact(id) {
     }
   } catch (err) {
     console.error("Error:", err);
+    alert("Gagal terhubung ke server.");
   }
 }
-
-// Inisialisasi Event Listener Saat DOM Siap
-document.addEventListener("DOMContentLoaded", function () {
-  loadAllData();
-
-  const refreshBtn = document.querySelector("#btn-refresh-data");
-  if (refreshBtn) {
-    refreshBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      loadAllData();
-    });
-  }
-
-  const logoutBtn = document.querySelector("#btn-logout");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      logoutAdmin();
-    });
-  }
-});
