@@ -1,202 +1,172 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kopi Kenangan</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <title>Kopi Kenangan Senja</title>
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,300;0,400;0,700;1,700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
       rel="stylesheet"
     />
-
-    <!-- Feather icons -->
     <script src="https://unpkg.com/feather-icons"></script>
-
-    <!-- My style -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Navabar start -->
+    <!-- Navbar Start -->
     <nav class="navbar">
-      <a href="#" class="navbar-logo">kenangan<span> senja</span> . </a>
+      <a href="#" class="navbar-logo">Kenangan<span>Senja</span>.</a>
       <div class="navbar-nav">
         <a href="#home">Home</a>
         <a href="#about">Tentang Kami</a>
         <a href="#menu">Menu</a>
         <a href="#contact">Kontak</a>
       </div>
-
       <div class="navbar-extra">
-        <a href="#" id="search"><i data-feather="search"></i></a>
-        <a href="#" id="shopping-cart"><i data-feather="shopping-cart"></i></a>
+        <a href="#" id="search-button"><i data-feather="search"></i></a>
+        <a href="#" id="shopping-cart-button"><i data-feather="shopping-cart"></i><span id="cart-count" style="background:#b6895b; color:#fff; padding:0.1rem 0.4rem; border-radius:50%; font-size:0.75rem;">0</span></a>
         <a href="#" id="hamburger-menu"><i data-feather="menu"></i></a>
       </div>
+
+      <!-- Search Form Box -->
+      <div class="search-form" id="search-form">
+        <input type="search" id="search-box" placeholder="Cari menu kopi..." />
+        <label for="search-box"><i data-feather="search"></i></label>
+      </div>
+
+      <!-- Shopping Cart Sidebar -->
+      <div class="shopping-cart">
+        <h3>Keranjang Belanja</h3>
+        <div id="cart-items-container" style="max-height: 50vh; overflow-y: auto; margin-bottom: 1rem;"></div>
+        <div style="font-weight: 600; margin-bottom: 1.5rem; display: flex; justify-content: space-between; font-size: 1.1rem; border-top: 1px solid #2a2a2a; padding-top: 1rem;">
+          <span>Total:</span>
+          <span id="cart-total-price" style="color: #b6895b;">IDR 0</span>
+        </div>
+        <form id="checkoutForm" style="display: flex; flex-direction: column; gap: 0.8rem;">
+          <input type="text" id="checkoutName" placeholder="Nama Lengkap" required style="padding: 0.8rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 0.4rem;" />
+          <input type="tel" id="checkoutPhone" placeholder="Nomor WhatsApp" required style="padding: 0.8rem; background: #222; color: #fff; border: 1px solid #444; border-radius: 0.4rem;" />
+          <button type="submit" style="background: linear-gradient(135deg, #b6895b, #9c734b); color: #fff; border: none; padding: 0.8rem; border-radius: 0.4rem; font-weight: 600; cursor: pointer;">Pesan via WhatsApp</button>
+        </form>
+      </div>
     </nav>
+    <!-- Navbar End -->
 
-    <!-- Navabar end -->
-
-    <!-- Hero Section start -->
-
+    <!-- Hero Section Start -->
     <section class="hero" id="home">
       <main class="content">
-        <h1>Mari Kita Nikmati Kopi</h1>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia nisi
-          excepturi aperiam molestias optio, officia totam veniam tempora
-          expedita veritatis omnis enim? Vero rerum ab odit ea vel maxime
-          voluptatum.
-        </p>
-        <a href="#" class="cta">Beli Sekarang</a>
+        <h1>Nikmati Secangkir <span>Kopi Senja</span></h1>
+        <p>Rasakan kehangatan dan kenikmatan biji kopi pilihan nusantara yang disajikan khusus untuk menemani hari Anda.</p>
+        <a href="#menu" class="cta">Beli Sekarang</a>
       </main>
     </section>
-    <!-- Hero Section end -->
+    <!-- Hero Section End -->
 
-    <!-- About section start -->
+    <!-- About Section Start -->
     <section id="about" class="about">
-      <h2><span>Tentang </span> Kami</h2>
-
+      <h2><span>Tentang</span> Kami</h2>
       <div class="row">
         <div class="about-img">
-          <img
-            src="img/michael-c-WU7geESRAIY-unsplash.jpg"
-            alt="Tentang Kami"
-          />
+          <img src="img/Gemini_Generated_Image_4scdzn4scdzn4scd.jfif" alt="Tentang Kami">
         </div>
         <div class="content">
-          <h3>Kenapa harus memilih kopi kami</h3>
-          <p>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Culpa
-            incidunt, pariatur quas fugit voluptates eveniet doloribus. Debitis
-            nostrum ex odio aliquam nisi harum perferendis officia, alias soluta
-            sed iure possimus?
-          </p>
+          <h3>Kenapa Memilih Kopi Kami?</h3>
+          <p>Kopi Kenangan Senja menghadirkan biji kopi pilihan kualitas terbaik dari petani lokal nusantara. Diolah dengan penuh ketelitian untuk menciptakan cita rasa kopi yang otentik dan berkesan di setiap tegukan.</p>
+          <p>Kami berkomitmen untuk memberikan kenyamanan dan pelayanan terbaik bagi setiap penikmat kopi yang datang.</p>
         </div>
       </div>
     </section>
-    <!-- About section end -->
+    <!-- About Section End -->
 
-    <!-- Menu Section start -->
+    <!-- Menu Section Start -->
     <section id="menu" class="menu">
-      <h2><span>Menu </span> Kami</h2>
-      <p>
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quo eaque,
-        quod et expedita corrupti quaerat sapiente, consectetur cupiditate ipsam
-        ea distinctio dicta? Eos animi maiores tenetur eius nesciunt, commodi
-        cupiditate.
-      </p>
-
-      <div class="row">
-        <div class="menu-card">
-          <img
-            src="coffe/jeremy-yap-jn-HaGWe4yw-unsplash (1).jpg"
-            alt="Espresso"
-            class="menu-card-img"
-          />
-          <h3 class="menu-card-tittle">- Espresso -</h3>
-          <p class="menu-card-price">IDR 25K</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="coffe/jeremy-yap-jn-HaGWe4yw-unsplash (1).jpg"
-            alt="Espresso"
-            class="menu-card-img"
-          />
-          <h3 class="menu-card-tittle">- Espresso -</h3>
-          <p class="menu-card-price">IDR 25K</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="coffe/jeremy-yap-jn-HaGWe4yw-unsplash (1).jpg"
-            alt="Espresso"
-            class="menu-card-img"
-          />
-          <h3 class="menu-card-tittle">- Espresso -</h3>
-          <p class="menu-card-price">IDR 25K</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="coffe/jeremy-yap-jn-HaGWe4yw-unsplash (1).jpg"
-            alt="Espresso"
-            class="menu-card-img"
-          />
-          <h3 class="menu-card-tittle">- Espresso -</h3>
-          <p class="menu-card-price">IDR 25K</p>
-        </div>
-        <div class="menu-card">
-          <img
-            src="coffe/jeremy-yap-jn-HaGWe4yw-unsplash (1).jpg"
-            alt="Espresso"
-            class="menu-card-img"
-          />
-          <h3 class="menu-card-tittle">- Espresso -</h3>
-          <p class="menu-card-price">IDR 25K</p>
-        </div>
-      </div>
+      <h2><span>Menu</span> Kami</h2>
+      <p>Pilih menu kopi favorit Anda di bawah ini dan nikmati kustomisasi sesuai selera.</p>
+      <div class="row" id="menu-products-row"></div>
     </section>
-    <!-- Menu Section end -->
-    <!-- Contact Section start -->
+    <!-- Menu Section End -->
+
+    <!-- Contact Section Start (Diperbaiki agar rapi dan proporsional) -->
     <section id="contact" class="contact">
-      <h2><span>Kontak </span> Kami</h2>
-      <p>
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Laudantium
-        sequi facilis nisi unde exercitationem eveniet?
-      </p>
+      <h2><span>Kontak</span> Kami</h2>
+      <p>Punya pertanyaan atau saran? Silakan kirimkan pesan kepada kami melalui formulir di bawah ini.</p>
       <div class="row">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126829.33545463349!2d106.70948914212684!3d-6.595016202702497!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c5b7ad0f824b%3A0x4c71fd1b0b8ae76d!2sKota%20Bogor%2C%20Jawa%20Barat!5e0!3m2!1sid!2sid!4v1792335950505!5m2!1sid!2sid"
-          allowfullscreen=""
-          loading="lazy"
-          referrerpolicy="strict-origin-when-cross-origin"
-          class="map"
-        ></iframe>
-        <form action="">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.952912261217!2d106.805545!3d-6.597147!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMzUnNDkuNyJTIDEwNsKwNDgnMjAuMCJF!5e0!3m2!1sid!2sid!4v1600000000000!5m2!1sid!2sid" allowfullscreen="" loading="lazy" class="map"></iframe>
+        
+        <form id="contactForm">
+          <h3>Kirim Pesan</h3>
           <div class="input-group">
             <i data-feather="user"></i>
-            <input type="text" placeholder="nama" />
+            <input type="text" id="contactName" placeholder="Nama Anda" required />
           </div>
           <div class="input-group">
             <i data-feather="mail"></i>
-            <input type="text" placeholder="email" />
+            <input type="email" id="contactEmail" placeholder="Email Anda" required />
           </div>
           <div class="input-group">
             <i data-feather="phone"></i>
-            <input type="text" placeholder="no hp " />
+            <input type="tel" id="contactPhone" placeholder="Nomor HP / WhatsApp" required />
           </div>
-          <button type="sumbit" class="btn">kirim pesan</button>
+          <div class="input-group textarea-group">
+            <i data-feather="message-square"></i>
+            <textarea id="contactMessage" placeholder="Tulis pesan Anda..." rows="4" required></textarea>
+          </div>
+          <button type="submit" class="btn-submit">Kirim Pesan</button>
         </form>
       </div>
     </section>
-    <!-- Contact Section end -->
-    <!-- Footer start -->
+    <!-- Contact Section End -->
+
+    <!-- Footer Start -->
     <footer>
       <div class="socials">
         <a href="#"><i data-feather="instagram"></i></a>
         <a href="#"><i data-feather="twitter"></i></a>
         <a href="#"><i data-feather="facebook"></i></a>
       </div>
-
       <div class="links">
         <a href="#home">Home</a>
         <a href="#about">Tentang Kami</a>
         <a href="#menu">Menu</a>
         <a href="#contact">Kontak</a>
       </div>
-
       <div class="credit">
-        <p>Created by <a href="">aika76</a>. l &&copy; 2023.</p>
+        <p>Created by <span>Zamirel Alfi Syahrin</span> | &copy; 2026.</p>
       </div>
     </footer>
-    <!-- Footer end -->
-    <!-- Feather icons -->
+    <!-- Footer End -->
+
+    <!-- Modal Kustomisasi Produk (Menggunakan kelas .custom-modal-overlay untuk animasi halus) -->
+    <div id="customModal" class="custom-modal-overlay">
+      <div class="custom-modal-box">
+        <h3 id="modalProductName" style="margin-bottom: 0.3rem; color: #b6895b; font-size: 1.4rem;">Nama Produk</h3>
+        <p id="modalBasePrice" style="margin-bottom: 1.5rem; font-weight: 600; font-size: 1.1rem; color: #ddd;">IDR 0</p>
+        <form id="customProductForm" style="display: flex; flex-direction: column; gap: 1.2rem;">
+          <div>
+            <label style="font-size: 0.9rem; color: #aaa; display: block; margin-bottom: 0.4rem;">Ukuran:</label>
+            <label style="margin-right: 1.5rem; cursor: pointer;"><input type="radio" name="size" value="Reguler" checked> Reguler</label>
+            <label style="cursor: pointer;"><input type="radio" name="size" value="Large"> Large</label>
+          </div>
+          <div>
+            <label style="font-size: 0.9rem; color: #aaa; display: block; margin-bottom: 0.4rem;">Gula (Sugar):</label>
+            <label style="margin-right: 1.5rem; cursor: pointer;"><input type="radio" name="sugar" value="Normal Sugar" checked> Normal</label>
+            <label style="cursor: pointer;"><input type="radio" name="sugar" value="Less Sugar"> Less</label>
+          </div>
+          <div>
+            <label style="font-size: 0.9rem; color: #aaa; display: block; margin-bottom: 0.4rem;">Es (Ice):</label>
+            <label style="margin-right: 1.5rem; cursor: pointer;"><input type="radio" name="ice" value="Normal Ice" checked> Normal</label>
+            <label style="cursor: pointer;"><input type="radio" name="ice" value="Less Ice"> Less</label>
+          </div>
+          <div style="display: flex; gap: 0.8rem; margin-top: 1rem;">
+            <button type="submit" style="flex: 1; background: linear-gradient(135deg, #b6895b, #8c633a); color: #fff; padding: 0.7rem; border: none; border-radius: 0.4rem; cursor: pointer; font-weight: 600;">Masukkan Keranjang</button>
+            <button type="button" onclick="closeCustomModal()" style="flex: 1; background-color: #333; color: #fff; padding: 0.7rem; border: none; border-radius: 0.4rem; cursor: pointer;">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Script JS -->
+    <script src="js/script.js"></script>
     <script>
       feather.replace();
     </script>
-
-    <!-- My Javascript -->
-    <script src="js/script.js"></script>
   </body>
 </html>

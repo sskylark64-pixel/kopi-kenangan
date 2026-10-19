@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Admin - Kopi Kenangan Senja</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background-color: #0b0b0b;
+        color: #fff;
+        padding: 1.5rem;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #2a2a2a;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      h1 span {
+        color: #b6895b;
+      }
+
+      .header-buttons {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+      }
+
+      .btn-refresh {
+        background-color: #b6895b;
+        color: #fff;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s ease;
+      }
+
+      .btn-refresh:hover {
+        background-color: #9c734b;
+      }
+
+      .section-box {
+        background-color: #161616;
+        border: 1px solid #2a2a2a;
+        padding: 1.5rem;
+        border-radius: 0.8rem;
+        margin-bottom: 2rem;
+      }
+
+      .section-box h2 {
+        color: #b6895b;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+      }
+
+      form {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      form input {
+        background-color: #222;
+        border: 1px solid #444;
+        color: #fff;
+        padding: 0.6rem 1rem;
+        border-radius: 0.4rem;
+        flex: 1 1 200px;
+        outline: none;
+      }
+
+      form input:focus {
+        border-color: #b6895b;
+      }
+
+      form button {
+        background-color: #b6895b;
+        color: #fff;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 0.4rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      form button:hover {
+        background-color: #9c734b;
+      }
+
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 1rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #161616;
+        border-radius: 0.5rem;
+        white-space: nowrap;
+      }
+
+      th, td {
+        padding: 0.8rem 1rem;
+        text-align: left;
+        border-bottom: 1px solid #2a2a2a;
+        font-size: 0.9rem;
+      }
+
+      th {
+        background-color: #222;
+        color: #b6895b;
+      }
+
+      .badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .badge-pending {
+        background-color: #ff9800;
+        color: #000;
+      }
+
+      .badge-selesai {
+        background-color: #4caf50;
+        color: #fff;
+      }
+
+      select {
+        background-color: #222;
+        color: #fff;
+        border: 1px solid #444;
+        padding: 0.4rem;
+        border-radius: 0.3rem;
+      }
+
+      .btn-delete {
+        background-color: #ff5c5c;
+        color: white;
+        border: none;
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.3rem;
+        cursor: pointer;
+      }
+
+      .btn-delete:hover {
+        background-color: #e04848;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 1rem;
+        }
+
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .header-buttons {
+          width: 100%;
+        }
+
+        .header-buttons button {
+          flex: 1;
+          justify-content: center;
+        }
+
+        form {
+          flex-direction: column;
+        }
+
+        form input, form button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Admin Dashboard - <span>Kopi Kenangan Senja</span></h1>
+      <div class="header-buttons">
+        <button class="btn-refresh" id="btn-refresh-data" type="button">
+          <i data-feather="refresh-cw"></i> Muat Ulang
+        </button>
+        <button class="btn-refresh" style="background-color: #ff5c5c;" id="btn-logout" type="button">
+          <i data-feather="log-out"></i> Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- BAGIAN 1: TAMBAH PRODUK BARU -->
+    <div class="section-box">
+      <h2>Tambah Menu Kopi Baru</h2>
+      <form id="addProductForm">
+        <input type="text" id="productName" placeholder="Nama Menu (Contoh: Mocca Latte)" required />
+        <input type="number" id="productPrice" placeholder="Harga (Contoh: 30000)" required />
+        <button type="submit">Tambah Produk</button>
+      </form>
+    </div>
+
+    <!-- BAGIAN 2: DAFTAR PRODUK KOPI -->
+    <div class="section-box">
+      <h2>Daftar Menu Kopi</h2>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nama Produk</th>
+              <th>Harga</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="products-table-body">
+            <tr>
+              <td colspan="4" style="text-align: center;">Memuat daftar produk...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BAGIAN 3: DAFTAR TRANSAKSI MASUK -->
+    <div class="section-box">
+      <h2>Daftar Transaksi Masuk</h2>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nama Pelanggan</th>
+              <th>No HP</th>
+              <th>Item Pesanan</th>
+              <th>Total Pembayaran</th>
+              <th>Tanggal</th>
+              <th>Status</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="orders-table-body">
+            <tr>
+              <td colspan="8" style="text-align: center;">Memuat data pesanan...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BAGIAN 4: DAFTAR PESAN KONTAK MASUK -->
+    <div class="section-box">
+      <h2>Pesan Masuk dari Pelanggan</h2>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nama Pengirim</th>
+              <th>Email</th>
+              <th>No HP</th>
+              <th>Pesan</th>
+              <th>Tanggal</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="contacts-table-body">
+            <tr>
+              <td colspan="7" style="text-align: center;">Memuat pesan kontak...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Edit Produk -->
+    <div class="checkout-modal-overlay" id="editProductModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 99999;">
+      <div class="section-box" style="width: 90%; max-width: 400px; background-color: #161616; padding: 2rem; border-radius: 1rem; border: 1px solid #b6895b;">
+        <h2 style="color: #b6895b; margin-bottom: 1rem;">Edit Menu Kopi</h2>
+        <form id="editProductForm" style="display: flex; flex-direction: column; gap: 1rem;">
+          <input type="hidden" id="editProductId" />
+          <div>
+            <label style="font-size: 0.9rem; color: #ccc;">Nama Produk</label>
+            <input type="text" id="editProductName" required style="width: 100%; margin-top: 0.3rem;" />
+          </div>
+          <div>
+            <label style="font-size: 0.9rem; color: #ccc;">Harga (IDR)</label>
+            <input type="number" id="editProductPrice" required style="width: 100%; margin-top: 0.3rem;" />
+          </div>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+            <button type="submit" style="flex: 1; background-color: #b6895b;">Simpan</button>
+            <button type="button" onclick="closeEditModal()" style="flex: 1; background-color: #444; color: #fff; border: none; padding: 0.6rem; border-radius: 0.4rem; cursor: pointer;">Batal</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+    <script>
+      feather.replace();
+    </script>
+  </body>
+</html>
