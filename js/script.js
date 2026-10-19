@@ -1,8 +1,8 @@
 // ==========================================
 // KONFIGURASI UTAMA
 // ==========================================
-const API_URL = "http://localhost:3000/api";
-const ADMIN_PHONE_NUMBER = "6285179804209"; // Ganti dengan nomor WhatsApp Admin Anda
+const API_URL = "https://kopikenangan-production.up.railway.app/api";
+const ADMIN_PHONE_NUMBER = "6285179804209"; // Nomor WhatsApp Admin
 
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 let products = [];
@@ -37,13 +37,14 @@ function renderProducts(listProducts) {
 
   menuRow.innerHTML = "";
   listProducts.forEach((product) => {
+    const productId = product.id || product._id;
     const card = document.createElement("div");
     card.classList.add("menu-card");
     card.innerHTML = `
-      <img src="${product.image || 'img/Gemini_Generated_Image_4scdzn4scdzn4scd.jfif'}" alt="${product.name}" />
+      <img src="${product.image || 'img/Gemini_Generated_Image_4scdzn4scdzn4scd.jpg'}" alt="${product.name}" />
       <h3 class="menu-card-title">${product.name}</h3>
-      <p class="menu-card-price">IDR ${product.price.toLocaleString("id-ID")}</p>
-      <button class="btn-add" type="button" onclick="openCustomModal(${product.id}, '${product.name}', ${product.price})">
+      <p class="menu-card-price">IDR ${Number(product.price).toLocaleString("id-ID")}</p>
+      <button class="btn-add" type="button" onclick="openCustomModal('${productId}', '${product.name}', ${product.price})">
         <i data-feather="shopping-cart" style="width: 16px; height: 16px;"></i> Tambah Ke Keranjang
       </button>
     `;
@@ -64,7 +65,7 @@ if (searchBox) {
 }
 
 // ==========================================
-// 2. MODAL KUSTOMISASI PRODUK (DENGAN ANIMASI HALUS)
+// 2. MODAL KUSTOMISASI PRODUK
 // ==========================================
 let selectedProduct = null;
 
@@ -76,14 +77,14 @@ function openCustomModal(id, name, price) {
   const basePrice = document.querySelector("#modalBasePrice");
 
   if (title) title.textContent = name;
-  if (basePrice) basePrice.textContent = `IDR ${price.toLocaleString("id-ID")}`;
+  if (basePrice) basePrice.textContent = `IDR ${Number(price).toLocaleString("id-ID")}`;
 
-  if (modal) modal.classList.add("active"); // Mengaktifkan animasi modal
+  if (modal) modal.classList.add("active");
 }
 
 function closeCustomModal() {
   const modal = document.querySelector("#customModal");
-  if (modal) modal.classList.remove("active"); // Menutup animasi modal
+  if (modal) modal.classList.remove("active");
   selectedProduct = null;
 }
 
@@ -168,7 +169,7 @@ function renderCart() {
     itemEl.innerHTML = `
       <div style="flex:1;">
         <h4 style="font-size:0.95rem; margin-bottom:0.2rem; color: #fff;">${item.name}</h4>
-        <p style="font-size:0.85rem; color:#b6895b; font-weight: 600;">IDR ${item.price.toLocaleString("id-ID")}</p>
+        <p style="font-size:0.85rem; color:#b6895b; font-weight: 600;">IDR ${Number(item.price).toLocaleString("id-ID")}</p>
       </div>
       <div style="display:flex; align-items:center; gap:0.6rem;">
         <button type="button" onclick="updateQuantity(${index}, -1)" style="padding:0.2rem 0.6rem; background:#333; color:#fff; border:none; border-radius:0.3rem; cursor:pointer;">-</button>
@@ -182,7 +183,7 @@ function renderCart() {
 }
 
 // ==========================================
-// 4. CHECKOUT & WHATSAPP DENGAN ORDER ID OTOMATIS
+// 4. CHECKOUT & WHATSAPP
 // ==========================================
 const checkoutForm = document.querySelector("#checkoutForm");
 if (checkoutForm) {
@@ -203,9 +204,9 @@ if (checkoutForm) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customer_name: customerName,
+          name: customerName,
           phone: phone,
-          total_amount: totalAmount,
+          total: totalAmount,
           items: cart
         })
       });
@@ -213,7 +214,7 @@ if (checkoutForm) {
       const result = await response.json();
 
       if (response.ok) {
-        const autoOrderId = result.orderId; // Order ID otomatis dari database MySQL
+        const autoOrderId = result.id || Date.now();
 
         const itemListText = cart
           .map((item) => `- ${item.name} (${item.quantity}x) = IDR ${(item.price * item.quantity).toLocaleString("id-ID")}`)
@@ -251,12 +252,12 @@ if (checkoutForm) {
 }
 
 // ==========================================
-// 5. FORM KONTAK PELANGGAN (MENCEGAH REFRESH / PINDAH HALAMAN)
+// 5. FORM KONTAK PELANGGAN
 // ==========================================
 const contactForm = document.querySelector("#contactForm");
 if (contactForm) {
   contactForm.addEventListener("submit", async function (e) {
-    e.preventDefault(); // Mencegah form melakukan reload halaman atau lari ke home
+    e.preventDefault();
 
     const name = document.querySelector("#contactName").value.trim();
     const email = document.querySelector("#contactEmail").value.trim();
@@ -286,7 +287,7 @@ if (contactForm) {
 }
 
 // ==========================================
-// 6. TOGGLE NAVBAR, SEARCH, & SHOPPING CART SIDEBAR
+// 6. TOGGLE NAVBAR, SEARCH, & SHOPPING CART
 // ==========================================
 document.addEventListener("DOMContentLoaded", function () {
   fetchProducts();
@@ -326,7 +327,6 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
-  // Klik di luar elemen untuk menutup menu / sidebar / pencarian
   document.addEventListener("click", function (e) {
     if (hamburger && navbarNav && !hamburger.contains(e.target) && !navbarNav.contains(e.target)) {
       navbarNav.classList.remove("active");

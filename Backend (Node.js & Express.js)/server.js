@@ -8,11 +8,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Database Sementara (In-Memory Data)
+// Database Sementara
 let products = [
-  { id: "1", name: "Kopi Kenangan Senja", price: 18000 },
-  { id: "2", name: "Espresso", price: 15000 },
-  { id: "3", name: "Kapucino", price: 20000 }
+  { id: "1", name: "Kopi Kenangan Senja", price: 18000, image: "img/Gemini_Generated_Image_4scdzn4scdzn4scd.jpg" },
+  { id: "2", name: "Espresso", price: 15000, image: "img/Gemini_Generated_Image_4scdzn4scdzn4scd.jpg" },
+  { id: "3", name: "Kapucino", price: 20000, image: "img/Gemini_Generated_Image_4scdzn4scdzn4scd.jpg" }
 ];
 
 let orders = [];
@@ -26,6 +26,11 @@ app.get("/", (req, res) => {
   });
 });
 
+// Endpoint Publik Produk (Diperlukan oleh script.js)
+app.get("/api/products", (req, res) => {
+  res.json(products);
+});
+
 // Endpoint Admin Login
 app.post("/api/admin/login", (req, res) => {
   const { username, password } = req.body;
@@ -36,7 +41,7 @@ app.post("/api/admin/login", (req, res) => {
   }
 });
 
-// Endpoint Produk
+// Endpoint Admin Produk
 app.get("/api/admin/products", (req, res) => {
   res.json(products);
 });
@@ -49,7 +54,8 @@ app.post("/api/admin/products", (req, res) => {
   const newProduct = {
     id: Date.now().toString(),
     name,
-    price: Number(price)
+    price: Number(price),
+    image: "img/Gemini_Generated_Image_4scdzn4scdzn4scd.jpg"
   };
   products.push(newProduct);
   res.status(201).json(newProduct);
