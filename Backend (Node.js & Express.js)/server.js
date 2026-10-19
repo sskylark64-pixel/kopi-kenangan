@@ -10,9 +10,10 @@ app.use(express.json());
 
 // Database Sementara
 let products = [
-  { id: "1", name: "Kopi Kenangan Senja", price: 18000, image: "img/Gemini_Generated_Image_4scdzn4scdzn4scd.jpg" },
-  { id: "2", name: "Espresso", price: 15000, image: "img/Gemini_Generated_Image_4scdzn4scdzn4scd.jpg" },
-  { id: "3", name: "Kapucino", price: 20000, image: "img/Gemini_Generated_Image_4scdzn4scdzn4scd.jpg" }
+  { id: "1", name: "Kopi  Americano", price: 18000, image: "img/..." },
+  { id: "2", name: "Espresso", price: 15000, image: "img/..." },
+  { id: "3", name: "Kapucino", price: 20000, image: "img/..." }
+  // Anda bisa menambahkan produk baru di sini
 ];
 
 let orders = [];
