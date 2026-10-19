@@ -1,143 +1,130 @@
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
-
+const express = require("express");
+const cors = require("cors");
 const app = express();
+
+const PORT = process.env.PORT || 3000;
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Koneksi Database MySQL
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'kopi_kenangan'
-});
+// Database Sementara (In-Memory Data)
+let products = [
+  { id: "1", name: "Kopi Kenangan Senja", price: 18000 },
+  { id: "2", name: "Espresso", price: 15000 },
+  { id: "3", name: "Kapucino", price: 20000 }
+];
 
-db.connect((err) => {
-  if (err) {
-    console.error('Gagal terhubung ke database MySQL:', err);
-    return;
-  }
-  console.log('Berhasil terhubung ke database MySQL.');
-});
+let orders = [];
+let contacts = [];
 
-// --- ENDPOINT PUBLIK: PRODUK ---
-app.get('/api/products', (req, res) => {
-  db.query('SELECT * FROM products', (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results);
+// Base Route
+app.get("/", (req, res) => {
+  res.json({
+    status: "Online",
+    message: "Server Backend Kopi Kenangan Senja Berjalan!"
   });
 });
 
-// --- ENDPOINT PUBLIK: TRANSAKSI / ORDER ---
-app.post('/api/orders', (req, res) => {
-  const { customer_name, phone, total_amount, items } = req.body;
-  const itemsString = items.map(i => `${i.name} (${i.quantity}x)`).join(', ');
-
-  const queryOrder = 'INSERT INTO orders (customer_name, phone, total_amount, items, status) VALUES (?, ?, ?, ?, "Pending")';
-  db.query(queryOrder, [customer_name, phone, total_amount, itemsString], (err, result) => {
-    if (err) {
-      console.error('Error MySQL Order:', err);
-      return res.status(500).json({ error: err.message });
-    }
-    res.json({ message: 'Pesanan berhasil disimpan!', orderId: result.insertId });
-  });
-});
-
-// --- ENDPOINT PUBLIK: KONTAK ---
-app.post('/api/contacts', (req, res) => {
-  const { name, email, phone, message } = req.body;
-  const query = 'INSERT INTO contacts (name, email, phone, message) VALUES (?, ?, ?, ?)';
-  db.query(query, [name, email, phone, message], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Pesan berhasil dikirim!' });
-  });
-});
-
-// --- FITUR LOGIN ADMIN ---
-app.post('/api/admin/login', (req, res) => {
+// Endpoint Admin Login
+app.post("/api/admin/login", (req, res) => {
   const { username, password } = req.body;
-  if (username === 'admin' && password === 'kopi123') {
-    res.json({ success: true, message: 'Login berhasil!' });
+  if (username === "admin" && password === "admin123") {
+    res.json({ success: true, message: "Login berhasil!" });
   } else {
-    res.status(401).json({ success: false, error: 'Username atau password salah!' });
+    res.status(401).json({ success: false, error: "Username atau password salah!" });
   }
 });
 
-// --- FITUR MANAJEMEN PRODUK (ADMIN) ---
-app.get('/api/admin/products', (req, res) => {
-  db.query('SELECT * FROM products', (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results);
-  });
+// Endpoint Produk
+app.get("/api/admin/products", (req, res) => {
+  res.json(products);
 });
 
-app.post('/api/admin/products', (req, res) => {
-  const { name, price, image } = req.body;
-  const query = 'INSERT INTO products (name, price, image) VALUES (?, ?, ?)';
-  const imgPath = image || 'coffe/jeremy-yap-jn-HaGWe4yw-unsplash (1).jpg';
-
-  db.query(query, [name, price, imgPath], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Produk berhasil ditambahkan!', productId: result.insertId });
-  });
+app.post("/api/admin/products", (req, res) => {
+  const { name, price } = req.body;
+  if (!name || !price) {
+    return res.status(400).json({ error: "Nama dan harga produk wajib diisi." });
+  }
+  const newProduct = {
+    id: Date.now().toString(),
+    name,
+    price: Number(price)
+  };
+  products.push(newProduct);
+  res.status(201).json(newProduct);
 });
 
-app.put('/api/admin/products/:id', (req, res) => {
+app.put("/api/admin/products/:id", (req, res) => {
   const { id } = req.params;
   const { name, price } = req.body;
-  const query = 'UPDATE products SET name = ?, price = ? WHERE id = ?';
-  db.query(query, [name, price, id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Produk berhasil diperbarui!' });
-  });
+  const index = products.findIndex((p) => p.id === id);
+  if (index !== -1) {
+    products[index] = { ...products[index], name, price: Number(price) };
+    res.json(products[index]);
+  } else {
+    res.status(404).json({ error: "Produk tidak ditemukan." });
+  }
 });
 
-app.delete('/api/admin/products/:id', (req, res) => {
+app.delete("/api/admin/products/:id", (req, res) => {
   const { id } = req.params;
-  db.query('DELETE FROM products WHERE id = ?', [id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Produk berhasil dihapus!' });
-  });
+  products = products.filter((p) => p.id !== id);
+  res.json({ message: "Produk berhasil dihapus." });
 });
 
-// --- FITUR MANAJEMEN PESANAN (ADMIN) ---
-// Hanya menampilkan pesanan yang statusnya BUKAN 'Selesai'
-app.get('/api/admin/orders', (req, res) => {
-  db.query("SELECT * FROM orders WHERE status != 'Selesai' ORDER BY created_at DESC", (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results);
-  });
+// Endpoint Pesanan/Transaksi
+app.get("/api/admin/orders", (req, res) => {
+  res.json(orders);
 });
 
-app.put('/api/admin/orders/:id', (req, res) => {
+app.post("/api/orders", (req, res) => {
+  const { name, phone, items, total } = req.body;
+  const newOrder = {
+    id: Date.now().toString(),
+    name,
+    phone,
+    items,
+    total,
+    date: new Date(),
+    status: "Pending"
+  };
+  orders.push(newOrder);
+  res.status(201).json(newOrder);
+});
+
+app.delete("/api/admin/orders/:id", (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
-
-  const query = 'UPDATE orders SET status = ? WHERE id = ?';
-  db.query(query, [status, id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Status pesanan berhasil diperbarui!' });
-  });
+  orders = orders.filter((o) => o.id !== id);
+  res.json({ message: "Pesanan berhasil dihapus." });
 });
 
-// --- FITUR MANAJEMEN KONTAK (ADMIN) ---
-app.get('/api/admin/contacts', (req, res) => {
-  db.query('SELECT * FROM contacts ORDER BY created_at DESC', (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(results);
-  });
+// Endpoint Kontak
+app.get("/api/admin/contacts", (req, res) => {
+  res.json(contacts);
 });
 
-app.delete('/api/admin/contacts/:id', (req, res) => {
+app.post("/api/contacts", (req, res) => {
+  const { name, email, phone, message } = req.body;
+  const newContact = {
+    id: Date.now().toString(),
+    name,
+    email,
+    phone,
+    message,
+    date: new Date()
+  };
+  contacts.push(newContact);
+  res.status(201).json(newContact);
+});
+
+app.delete("/api/admin/contacts/:id", (req, res) => {
   const { id } = req.params;
-  db.query('DELETE FROM contacts WHERE id = ?', [id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Pesan kontak berhasil dihapus!' });
-  });
+  contacts = contacts.filter((c) => c.id !== id);
+  res.json({ message: "Pesan kontak berhasil dihapus." });
 });
 
-app.listen(3000, () => {
-  console.log('Server backend berjalan di http://localhost:3000');
+// Menjalankan Server
+app.listen(PORT, () => {
+  console.log(`Server berjalan di port ${PORT}`);
 });
