@@ -151,12 +151,12 @@ body {
   min-height: 100vh;
   display: flex;
   align-items: center;
-  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(11,11,11,1)), url(../img/Gemini_Generated_Image_4scdzn4scdzn4scd.jpg);
+  background-image: linear-gradient(rgba(0,0,0,0.5), rgba(11,11,11,1)), url(img/Gemini_Generated_Image_4scdzn4scdzn4scd.jpg);
+  padding-top: 80px; /* Sekaligus agar teks tidak tertutup navbar */
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
   position: relative;
-  padding-top: 80px; /* Tambahkan baris ini agar tidak tertutup navbar */
 }
 
 .hero .content {
